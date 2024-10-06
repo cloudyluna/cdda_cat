@@ -36,12 +36,9 @@ impl TryFrom<Release> for CDDARelease {
                 body: release.body,
                 published_at: DateTimePublished::new(*release.published_at),
                 url: release.url.to_string(),
-                assets: ReleaseAssets::new(
-                    release_assets
-                        .filter(|asset| asset.platform != Platform::Unsupported)
-                        .collect(),
-                ),
+                assets: Vec::default(),
             };
+
             Ok(CDDARelease(release))
         }
     }

@@ -143,22 +143,20 @@ impl ReleaseAssets {
 }
 
 #[derive(Debug, PartialEq, Default, Serialize, Deserialize)]
+pub struct ReleaseRawAsset {
+    pub name: String,
+    pub url: String,
+    pub browser_download_url: String,
+}
+
+#[derive(Debug, PartialEq, Default, Serialize, Deserialize)]
 pub struct Release {
     pub name: String,
     pub tag_name: String,
     pub body: String,
     pub published_at: DateTimePublished,
     pub url: String,
-    pub assets: ReleaseAssets,
-}
-
-impl Release {
-    pub fn get_asset(&self, platform: Platform, edition: Edition) -> Option<Asset> {
-        self.assets
-            .iter()
-            .find(|asset| asset.platform == platform && asset.edition == edition)
-            .cloned()
-    }
+    pub assets: Vec<ReleaseRawAsset>,
 }
 
 #[derive(Debug, PartialEq, Deref, Serialize, Deserialize, Clone)]

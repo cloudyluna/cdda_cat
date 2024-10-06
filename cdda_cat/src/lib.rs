@@ -8,7 +8,7 @@ use cdda_cat_lib::github_client::GithubClient;
 use cdda_cat_lib::installation_manager::{AppSettings, CDDARelease};
 use std::fs::{self, create_dir_all};
 use std::path::Path;
-use std::process;
+use std::{default, process};
 pub mod infra;
 
 fn create_settings_file_unless_exists(settings_filepath: &Path) -> Result<(), Error> {
@@ -151,11 +151,8 @@ pub async fn run() -> anyhow::Result<()> {
                 .map_err(|_| anyhow!("Cannot convert top download directory path to String"))?;
             let root_download_directory_path = RootDownloadDirectoryPath::new(&system_download_dir);
             let release = CDDARelease::fetch_by_tag(gh_client, &release_tag).await?;
-            let asset = release
-                .get_asset(Platform::Linux, edition.unwrap_or_default())
-                .ok_or_else(|| {
-                    anyhow!("Cannot find asset! Maybe try again with different edition?")
-                })?;
+            let asset = Asset::default();
+            // TODO: Make a new Release::get_asset
 
             let game_edition_directory_path =
                 root_download_directory_path.to_game_edition_directory_path(&asset);

@@ -1,6 +1,8 @@
 use anyhow::Error;
 use async_trait::async_trait;
-use cdda_cat_data::entities::Release;
+use cdda_cat_data::entities::{DateTimePublished, Release, ReleaseAssets};
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
 
 #[async_trait]
 pub trait RepositoryReleaseClient {
@@ -21,15 +23,24 @@ impl GithubClient {
         }
     }
 }
+
+static APP_USER_AGENT: &str = concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"),);
+
 #[async_trait]
 impl RepositoryReleaseClient for GithubClient {
     async fn get_by_tag(&self, tag: &str) -> Result<Release, Error> {
-        Ok(reqwest::get(format!(
-            "{}/{}/{}/releases/tags/{}",
-            API_ROOT, self.owner_name, self.repo_name, tag
-        ))
-        .await?
-        .json::<Release>()
-        .await?)
+        let client = reqwest::Client::builder()
+            .user_agent(APP_USER_AGENT)
+            .build()?;
+
+        Ok(client
+            .get(format!(
+                "{}/{}/{}/releases/tags/{}",
+                API_ROOT, self.owner_name, self.repo_name, tag
+            ))
+            .send()
+            .await?
+            .json::<Release>()
+            .await?)
     }
 }
