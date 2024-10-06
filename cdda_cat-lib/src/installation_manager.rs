@@ -22,7 +22,7 @@ impl TryFrom<Release> for CDDARelease {
     fn try_from(release: Release) -> Result<CDDARelease, Self::Error> {
         let release_assets = release.assets.iter().map(|github_release_asset| Asset {
             name: github_release_asset.name.to_string(),
-            tag: release.tag.to_string(),
+            tag: release.tag_name.to_string(),
             platform: Platform::from(github_release_asset.name.as_str()),
             edition: Edition::from(github_release_asset.name.as_str()),
             url: github_release_asset.url.to_string(),
@@ -32,8 +32,8 @@ impl TryFrom<Release> for CDDARelease {
         {
             let release = Release {
                 name: release.name,
-                tag: release.tag.to_string(),
-                description: release.description,
+                tag_name: release.tag_name.to_string(),
+                body: release.body,
                 published_at: DateTimePublished::new(*release.published_at),
                 url: release.url.to_string(),
                 assets: ReleaseAssets::new(

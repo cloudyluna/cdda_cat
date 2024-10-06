@@ -145,8 +145,8 @@ impl ReleaseAssets {
 #[derive(Debug, PartialEq, Default, Serialize, Deserialize)]
 pub struct Release {
     pub name: String,
-    pub tag: String,
-    pub description: String,
+    pub tag_name: String,
+    pub body: String,
     pub published_at: DateTimePublished,
     pub url: String,
     pub assets: ReleaseAssets,
