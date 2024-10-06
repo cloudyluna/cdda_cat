@@ -1,0 +1,3 @@
+[workspace]
+members = ["cdda_cat", "cdda_cat-data", "cdda_cat-lib"]
+resolver = "2"

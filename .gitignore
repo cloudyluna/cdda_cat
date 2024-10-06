@@ -1,0 +1,5 @@
+.direnv
+/target/
+*.tar.gz
+/cdda-downloads/
+*.json
