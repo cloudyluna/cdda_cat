@@ -33,7 +33,7 @@ impl RepositoryReleaseClient for GithubClient {
             .user_agent(APP_USER_AGENT)
             .build()?;
 
-        Ok(client
+        let k = client
             .get(format!(
                 "{}/{}/{}/releases/tags/{}",
                 API_ROOT, self.owner_name, self.repo_name, tag
@@ -41,6 +41,9 @@ impl RepositoryReleaseClient for GithubClient {
             .send()
             .await?
             .json::<Release>()
-            .await?)
+            .await?;
+        println!("{:?}", k.assets[0]);
+
+        Ok(k)
     }
 }

@@ -151,8 +151,30 @@ pub async fn run() -> anyhow::Result<()> {
                 .map_err(|_| anyhow!("Cannot convert top download directory path to String"))?;
             let root_download_directory_path = RootDownloadDirectoryPath::new(&system_download_dir);
             let release = CDDARelease::fetch_by_tag(gh_client, &release_tag).await?;
-            let asset = Asset::default();
-            // TODO: Make a new Release::get_asset
+            let mut release_assets = release.assets.iter().map(|asset| Asset {
+                name: asset.name.to_string(),
+                tag: release.tag_name.to_string(),
+                platform: Platform::from(asset.name.as_str()),
+                edition: Edition::from(asset.name.as_str()),
+                url: asset.browser_download_url.to_string(),
+                game_edition_directory_path: GameEditionDirectoryPath::default(),
+            });
+
+            let asset = release_assets
+                .find(|a: &Asset| -> bool {
+                    if let Some(ed) = &edition {
+                        a.edition == *ed
+                    } else {
+                        a.edition == Edition::default()
+                    }
+                })
+                .with_context(|| {
+                    format!(
+                        "No asset with release tag of {} and edition of {} was found to uninstall!",
+                        release_tag,
+                        edition.unwrap()
+                    )
+                })?;
 
             let game_edition_directory_path =
                 root_download_directory_path.to_game_edition_directory_path(&asset);

@@ -20,27 +20,16 @@ impl CDDARelease {
 impl TryFrom<Release> for CDDARelease {
     type Error = anyhow::Error;
     fn try_from(release: Release) -> Result<CDDARelease, Self::Error> {
-        let release_assets = release.assets.iter().map(|github_release_asset| Asset {
-            name: github_release_asset.name.to_string(),
-            tag: release.tag_name.to_string(),
-            platform: Platform::from(github_release_asset.name.as_str()),
-            edition: Edition::from(github_release_asset.name.as_str()),
-            url: github_release_asset.url.to_string(),
-            game_edition_directory_path: GameEditionDirectoryPath::default(),
-        });
+        let release = Release {
+            name: release.name,
+            tag_name: release.tag_name.to_string(),
+            body: release.body,
+            published_at: DateTimePublished::new(*release.published_at),
+            url: release.url.to_string(),
+            assets: release.assets,
+        };
 
-        {
-            let release = Release {
-                name: release.name,
-                tag_name: release.tag_name.to_string(),
-                body: release.body,
-                published_at: DateTimePublished::new(*release.published_at),
-                url: release.url.to_string(),
-                assets: Vec::default(),
-            };
-
-            Ok(CDDARelease(release))
-        }
+        Ok(CDDARelease(release))
     }
 }
 
