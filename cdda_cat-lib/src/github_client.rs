@@ -1,8 +1,6 @@
 use anyhow::Error;
 use async_trait::async_trait;
-use cdda_cat_data::entities::{DateTimePublished, Release, ReleaseAssets};
-use serde::{Deserialize, Serialize};
-use serde_json::Value;
+use cdda_cat_data::entities::Release;
 
 #[async_trait]
 pub trait RepositoryReleaseClient {
@@ -33,7 +31,7 @@ impl RepositoryReleaseClient for GithubClient {
             .user_agent(APP_USER_AGENT)
             .build()?;
 
-        let k = client
+        Ok(client
             .get(format!(
                 "{}/{}/{}/releases/tags/{}",
                 API_ROOT, self.owner_name, self.repo_name, tag
@@ -41,9 +39,6 @@ impl RepositoryReleaseClient for GithubClient {
             .send()
             .await?
             .json::<Release>()
-            .await?;
-        println!("{:?}", k.assets[0]);
-
-        Ok(k)
+            .await?)
     }
 }

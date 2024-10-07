@@ -1,9 +1,6 @@
 use crate::github_client::{GithubClient, RepositoryReleaseClient};
 use anyhow::{Context, Error};
-use cdda_cat_data::entities::{
-    Asset, DateTimePublished, Edition, GameEditionDirectoryPath, Platform, Release, ReleaseAssets,
-    Settings,
-};
+use cdda_cat_data::entities::{DateTimePublished, Release, Settings};
 use derive_more::{Deref, DerefMut};
 use serde::{Deserialize, Serialize};
 use std::{fs, path::Path};

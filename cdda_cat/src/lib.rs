@@ -8,7 +8,7 @@ use cdda_cat_lib::github_client::GithubClient;
 use cdda_cat_lib::installation_manager::{AppSettings, CDDARelease};
 use std::fs::{self, create_dir_all};
 use std::path::Path;
-use std::{default, process};
+use std::process;
 pub mod infra;
 
 fn create_settings_file_unless_exists(settings_filepath: &Path) -> Result<(), Error> {
@@ -39,7 +39,7 @@ enum Options {
 }
 
 fn launch() -> impl Parser<Options> {
-    let release_tag = long("tag").help("Tag name").argument("TAG");
+    let release_tag = long("tag").help("Release tag").argument("TAG");
     let edition = long("edition").help("Edition").argument("EDITION");
     construct!(Options::Launch {
         release_tag,
@@ -48,7 +48,7 @@ fn launch() -> impl Parser<Options> {
 }
 
 fn install() -> impl Parser<Options> {
-    let release_tag = long("tag").help("Tag name").argument("TAG");
+    let release_tag = long("tag").help("Release tag").argument("TAG");
     let download_only = long("download_only").help("Download only").switch();
     let overwrite = long("overwrite").help("Overwrite").switch();
     let edition = long("edition")
