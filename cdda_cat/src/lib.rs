@@ -40,7 +40,11 @@ enum Options {
 
 fn launch() -> impl Parser<Options> {
     let release_tag = long("tag").help("Release tag").argument("TAG");
-    let edition = long("edition").help("Edition").argument("EDITION");
+    let edition = long("edition")
+        .help("Edition")
+        .argument("EDITION")
+        .fallback(Edition::default())
+        .display_fallback();
     construct!(Options::Launch {
         release_tag,
         edition
@@ -54,6 +58,8 @@ fn install() -> impl Parser<Options> {
     let edition = long("edition")
         .help("Edition")
         .argument("EDITION")
+        .fallback(Edition::default())
+        .display_fallback()
         .optional();
     construct!(Options::Install {
         release_tag,
@@ -65,7 +71,11 @@ fn install() -> impl Parser<Options> {
 
 fn uninstall() -> impl Parser<Options> {
     let release_tag = long("tag").help("Tag name").argument("TAG");
-    let edition = long("edition").help("Edition").argument("EDITION");
+    let edition = long("edition")
+        .help("Edition")
+        .argument("EDITION")
+        .fallback(Edition::default())
+        .display_fallback();
     let remove_cdda_dir_only = long("remove_cdda_dir_only").help("REMOVE DIR").switch();
 
     construct!(Options::Uninstall {
@@ -123,7 +133,7 @@ pub async fn run() -> anyhow::Result<()> {
                 })
                 .with_context(|| {
                     format!(
-                        "No asset with release tag of {} and edition of {} was found to uninstall!",
+                        "No asset with release tag of {} and edition of {} was found to be launched!",
                         release_tag, edition
                     )
                 })?;
@@ -161,19 +171,12 @@ pub async fn run() -> anyhow::Result<()> {
             });
 
             let asset = release_assets
-                .find(|a: &Asset| -> bool {
-                    if let Some(ed) = &edition {
-                        a.edition == *ed
-                    } else {
-                        a.edition == Edition::default()
-                    }
+                .find(|asset: &Asset| {
+                    asset.platform == Platform::Linux
+                        && asset.edition == edition.clone().unwrap_or_default()
                 })
-                .with_context(|| {
-                    format!(
-                        "No asset with release tag of {} and edition of {} was found to uninstall!",
-                        release_tag,
-                        edition.unwrap()
-                    )
+                .ok_or_else(|| {
+                    anyhow!("Cannot find asset! Maybe try again with different edition?")
                 })?;
 
             let game_edition_directory_path =
